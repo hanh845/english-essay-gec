@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 
@@ -17,16 +18,16 @@ def statistics_by_user(
         COUNT(p.prediction_id) AS total_errors,
         COUNT(DISTINCT d.document_id) AS total_documents,
         AVG(p.confidence) AS avg_confidence
-    FROM db_assignment.authors a
-    JOIN db_assignment.document_authors da
+    FROM authors a 
+    JOIN document_authors da
         ON a.author_id = da.author_id
-    JOIN db_assignment.documents d
+    JOIN documents d
         ON da.document_id = d.document_id
-    JOIN db_assignment.document_versions dv
+    JOIN document_versions dv
         ON d.document_id = dv.document_id
-    JOIN db_assignment.sentences s
+    JOIN sentences s
         ON dv.version_id = s.version_id
-    JOIN db_assignment.predictions p
+    JOIN predictions p
         ON s.sentence_id = p.sentence_id
     WHERE a.author_id = :author_id
         AND p.label = 1
@@ -34,7 +35,7 @@ def statistics_by_user(
     """
 
     result = db.execute(
-        query,
+        text(query),
         {"author_id": author_id}
     )
 
@@ -49,13 +50,13 @@ def statistics_error_type(db: Session = Depends(get_db)):
     SELECT
         error_type,
         COUNT(*) AS total
-    FROM db_assignment.predictions
+    FROM predictions
     WHERE label = 1
     GROUP BY error_type
     ORDER BY total DESC
     """
 
-    result = db.execute(query)
+    result = db.execute(text(query))
 
     rows = result.fetchall()
 

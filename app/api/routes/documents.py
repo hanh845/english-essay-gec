@@ -3,6 +3,7 @@ from fastapi import UploadFile
 from fastapi import File
 from fastapi import Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.core.database import get_db
 from app.services.pdf_parser_service import extract_text_from_pdf
 from app.services.sentence_service import split_sentences
@@ -141,17 +142,17 @@ def get_document_errors(
         p.corrected_text,
         p.error_type,
         p.confidence
-    FROM db_assignment.predictions p
-    JOIN db_assignment.sentences s
+    FROM predictions p 
+    JOIN sentences s
         ON p.sentence_id = s.sentence_id
-    JOIN db_assignment.document_versions dv
+    JOIN document_versions dv
         ON s.version_id = dv.version_id
     WHERE dv.document_id = :document_id
         AND p.label = 1
     """
 
     result = db.execute(
-        query,
+        text(query),
         {"document_id": document_id}
     )
 

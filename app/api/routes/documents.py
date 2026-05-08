@@ -46,7 +46,10 @@ async def upload_document(
         created_at=datetime.now()
     )
 
+
     db.add(document)
+    db.commit()
+    db.refresh(document)
 
     from app.models.document_version import DocumentVersion
 
@@ -58,10 +61,14 @@ async def upload_document(
     )
 
     db.add(version)
+    db.commit()
+
+    db.refresh(version)
 
     for idx, sentence in enumerate(raw_sentences):
         sentence_obj = Sentence(
             sentence_id=str(uuid.uuid4()),
+            document_id=document_id,
             version_id=version_id,
             content=sentence,
             position=idx + 1,

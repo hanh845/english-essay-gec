@@ -1,6 +1,7 @@
 import uuid
 from sqlalchemy.orm import Session
 from app.ml.inference import correct_sentence
+from app.models.models import Model
 from app.models.prediction import Prediction
 
 ERROR_TYPES = {
@@ -31,6 +32,19 @@ def predict_sentence(
 
     confidence = 0.95
 
+    existing_model = db.query(Model).filter(Model.model_id == model_id).first()
+
+    if not existing_model:
+        new_model = Model(
+            model_id=model_id,
+            model_name="prithivida/grammar_error_correcter_v1",
+            version="1.0",
+            accuracy=0.95
+        )
+
+        db.add(new_model)
+        db.flush()
+
     prediction = Prediction(
         prediction_id=str(uuid.uuid4()),
         sentence_id=sentence_id,
@@ -44,5 +58,6 @@ def predict_sentence(
 
     db.add(prediction)
     db.commit()
+    db.refresh(prediction)
 
     return prediction

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS models (
 -- 7. sentences
 CREATE TABLE IF NOT EXISTS sentences (
     sentence_id UUID PRIMARY KEY,
+	document_id UUID REFERENCES documents(document_id),
 	version_id UUID REFERENCES document_versions(version_id),
 	content TEXT,
 	position INTEGER,

@@ -1,11 +1,11 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, T5Tokenizer
 from transformers import AutoModelForSeq2SeqLM
 
 import torch
 
-MODEL_PATH = "models_saved/bert-gec"
+MODEL_PATH = "vennify/t5-base-grammar-correction"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, legacy=False)
 model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_PATH)
 
 

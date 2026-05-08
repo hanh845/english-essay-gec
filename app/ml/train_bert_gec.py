@@ -12,7 +12,7 @@ MODEL_NAME = "prithivida/grammar_error_correcter_v1"
 
 
 def train_model(csv_path: str):
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, use_fast=False)
 
     model = AutoModelForSeq2SeqLM.from_pretrained(MODEL_NAME, use_safetensors=False)
 

@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS sentences CASCADE;
 DROP TABLE IF EXISTS predictions CASCADE;
 
 
--- 1. Tạo table authors
+-- 1. Create table authors
 CREATE TABLE IF NOT EXISTS authors (
     author_id UUID PRIMARY KEY,
 	name VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS authors (
 );
 			
 
--- 2. Tạo table documents
+-- 2. Create table documents
 CREATE TABLE IF NOT EXISTS documents (
     document_id UUID PRIMARY KEY,
 	title TEXT,
@@ -26,24 +26,24 @@ CREATE TABLE IF NOT EXISTS documents (
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Tạo table document_authors
+-- 3. Create table document_authors
 CREATE TABLE IF NOT EXISTS document_authors (
-    document_id UUID REFERENCES db_assignment.documents(document_id),
-	author_id UUID REFERENCES db_assignment.authors(author_id),
+    document_id UUID REFERENCES documents(document_id),
+	author_id UUID REFERENCES authors(author_id),
 	PRIMARY KEY (document_id, author_id)
 );					
 
--- 4. Tạo table Lang-8
+-- 4. Create table Lang-8
 CREATE TABLE IF NOT EXISTS lang_8 (
     id SERIAL PRIMARY KEY,
     source TEXT,
     target TEXT
 );			
 	
--- 5. Tạo table document_versions
+-- 5. Create table document_versions
 CREATE TABLE IF NOT EXISTS document_versions (
     version_id UUID PRIMARY KEY,
-	document_id UUID REFERENCES db_assignment.documents(document_id),
+	document_id UUID REFERENCES documents(document_id),
 	extracted_text TEXT,
 	extraction_method VARCHAR(100),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS models (
 -- 7. sentences
 CREATE TABLE IF NOT EXISTS sentences (
     sentence_id UUID PRIMARY KEY,
-	version_id UUID REFERENCES db_assignment.document_versions(version_id),
+	version_id UUID REFERENCES document_versions(version_id),
 	content TEXT,
 	position INTEGER,
 	is_clean BOOLEAN DEFAULT TRUE,
@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS sentences (
 -- 8. predictions
 CREATE TABLE IF NOT EXISTS predictions (
     prediction_id UUID PRIMARY KEY,
-	sentence_id UUID REFERENCES db_assignment.sentences(sentence_id),
-	model_id UUID REFERENCES db_assignment.models(model_id),
+	sentence_id UUID REFERENCES sentences(sentence_id),
+	model_id UUID REFERENCES models(model_id),
 	label INTEGER,
 	confidence FLOAT,
 	original_text TEXT,

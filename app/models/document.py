@@ -1,10 +1,11 @@
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
 
 from app.core.database import Base
+from app.models.document_author import document_authors
 
 
 class Document(Base):
@@ -25,6 +26,12 @@ class Document(Base):
     created_at = Column(
         DateTime,
         default=datetime.utcnow
+    )
+
+    authors = relationship(
+        "Author",
+        secondary=document_authors,
+        back_populates="documents"
     )
 
     # relationship sentences

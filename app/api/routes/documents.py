@@ -9,6 +9,7 @@ from app.services.pdf_parser_service import extract_text_from_pdf
 from app.services.sentence_service import split_sentences
 from app.models.document import Document
 from app.models.sentence import Sentence
+from app.models.author import Author
 import uuid
 import os
 from datetime import datetime
@@ -21,6 +22,7 @@ UPLOAD_DIR = "data/uploads"
 @router.post("/documents/upload")
 async def upload_document(
         title: str,
+        author_id: str,
         file: UploadFile = File(...),
         db: Session = Depends(get_db)
 ):
@@ -39,6 +41,17 @@ async def upload_document(
     document_id = str(uuid.uuid4())
     version_id = str(uuid.uuid4())
 
+    author = (
+        db.query(Author)
+            .filter(Author.author_id == author_id)
+            .first()
+    )
+
+    if not author:
+        return {
+            "error": "Author not found"
+        }
+
     document = Document(
         document_id=document_id,
         title=title,
@@ -47,6 +60,8 @@ async def upload_document(
         created_at=datetime.now()
     )
 
+    # N-N relationship
+    document.authors.append(author)
 
     db.add(document)
     db.commit()
@@ -81,7 +96,8 @@ async def upload_document(
     db.commit()
 
     return {
-        "document_id": document_id,
+        "message": "Upload successful",
+        "document_id": str(document.document_id),
         "total_sentences": len(raw_sentences)
     }
 
